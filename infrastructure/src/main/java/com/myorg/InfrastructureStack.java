@@ -1,10 +1,13 @@
 package com.myorg;
 
 import software.amazon.awscdk.Duration;
+import software.amazon.awscdk.RemovalPolicy;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.constructs.Construct;
 import software.amazon.awscdk.services.s3.*;
+import software.amazon.awscdk.services.dynamodb.*;
+import software.amazon.awscdk.services.stepfunctions.*;
 
 public class InfrastructureStack extends Stack {
     public InfrastructureStack(final Construct scope, final String id, final StackProps props) {
@@ -25,6 +28,34 @@ public class InfrastructureStack extends Stack {
                         .allowedMethods(java.util.List.of(HttpMethods.GET))
                         .allowedOrigins(java.util.List.of("*"))
                         .build()))
+                .build();
+
+        // DynamoDB table for encoding jobs
+        Table jobTable = Table.Builder.create(this, "AE2JobTable")
+                .partitionKey(Attribute.builder()
+                        .name("jobId")
+                        .type(AttributeType.STRING)
+                        .build())
+                .billingMode(BillingMode.PAY_PER_REQUEST)
+                .removalPolicy(RemovalPolicy.DESTROY)
+                .build();
+
+        // GSI so we can query by job status from the frontend
+        jobTable.addGlobalSecondaryIndex(GlobalSecondaryIndexProps.builder()
+                .indexName("status-index")
+                .partitionKey(Attribute.builder()
+                        .name("jobStatus")
+                        .type(AttributeType.STRING)
+                        .build())
+                .projectionType(ProjectionType.ALL)
+                .build());
+
+        // Placeholder Step Functions workflow – a single Pass
+        Pass noOp = Pass.Builder.create(this, "NoOp").build();
+
+        StateMachine sm = StateMachine.Builder.create(this, "AE2TranscodeStateMachine")
+                .definition(noOp)
+                .timeout(Duration.hours(2))
                 .build();
     }
 }
