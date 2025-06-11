@@ -1,0 +1,40 @@
+{
+  "Name": "AutoEncode2-540p-h264-qvbr",
+  "Settings": {
+    "OutputGroups": [
+      {
+        "Name": "CMAF",
+        "OutputGroupSettings": {
+          "Type": "CMAF_GROUP_SETTINGS",
+          "CmafGroupSettings": {
+            "Destination": "s3://OUTPUT_BUCKET/540p/",
+            "SegmentLength": 6,
+            "FragmentLength": 2
+          }
+        },
+        "Outputs": [
+          {
+            "VideoDescription": {
+              "Width": 960,
+              "Height": 540,
+              "CodecSettings": {
+                "Codec": "H_264",
+                "H264Settings": {
+                  "RateControlMode": "QVBR",
+                  "QvbrSettings": {
+                    "QvbrQualityLevel": 8,
+                    "MaxAverageBitrate": 1800000
+                  },
+                  "GopSize": 48,
+                  "GopSizeUnits": "FRAMES",
+                  "QualityTuningLevel": "SINGLE_PASS"
+                }
+              }
+            },
+            "ContainerSettings": { "Container": "CMFC" }
+          }
+        ]
+      }
+    ]
+  }
+}

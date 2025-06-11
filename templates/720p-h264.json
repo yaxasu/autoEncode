@@ -1,0 +1,37 @@
+{
+  "Name": "AutoEncode2-720p-h264",
+  "Settings": {
+    "OutputGroups": [
+      {
+        "Name": "CMAF",
+        "OutputGroupSettings": {
+          "Type": "CMAF_GROUP_SETTINGS",
+          "CmafGroupSettings": {
+            "Destination": "s3://OUTPUT_BUCKET/720p/",
+            "SegmentLength": 6,
+            "FragmentLength": 2
+          }
+        },
+        "Outputs": [
+          {
+            "VideoDescription": {
+              "Width": 1280,
+              "Height": 720,
+              "CodecSettings": {
+                "Codec": "H_264",
+                "H264Settings": {
+                  "RateControlMode": "VBR",
+                  "MaxBitrate": 3000000,
+                  "GopSize": 48,
+                  "GopSizeUnits": "FRAMES",
+                  "QualityTuningLevel": "SINGLE_PASS"
+                }
+              }
+            },
+            "ContainerSettings": { "Container": "CMFC" }
+          }
+        ]
+      }
+    ]
+  }
+}

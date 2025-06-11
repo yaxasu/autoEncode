@@ -1,0 +1,40 @@
+{
+  "Name": "AutoEncode2-1080p-h265",
+  "Settings": {
+    "OutputGroups": [
+      {
+        "Name": "CMAF",
+        "OutputGroupSettings": {
+          "Type": "CMAF_GROUP_SETTINGS",
+          "CmafGroupSettings": {
+            "Destination": "s3://OUTPUT_BUCKET/1080p/",
+            "SegmentLength": 6,
+            "FragmentLength": 2
+          }
+        },
+        "Outputs": [
+          {
+            "VideoDescription": {
+              "Width": 1920,
+              "Height": 1080,
+              "CodecSettings": {
+                "Codec": "H_265",
+                "H265Settings": {
+                  "RateControlMode": "CBR",
+                  "Bitrate": 5000000,
+                  "GopSize": 48,
+                  "GopSizeUnits": "FRAMES",
+                  "GopBReference": "ENABLED",
+                  "QualityTuningLevel": "SINGLE_PASS_HQ"
+                }
+              }
+            },
+            "ContainerSettings": {
+              "Container": "CMFC"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
