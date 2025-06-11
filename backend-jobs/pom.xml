@@ -1,12 +1,26 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>com.autoencode.backend</groupId>
   <artifactId>backend-jobs</artifactId>
-  <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
   <name>backend-jobs</name>
   <url>http://maven.apache.org</url>
+
+  <!-- ───────────────────────── Java 21 compiler controls ───────────────────────── -->
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+  </properties>
+
+  <!-- ─────────────────────────────── Dependencies ─────────────────────────────── -->
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -14,6 +28,7 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>dynamodb</artifactId>
@@ -24,6 +39,7 @@
       <artifactId>sfn</artifactId>
       <version>2.25.38</version>
     </dependency>
+
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-lambda-java-core</artifactId>
@@ -35,8 +51,11 @@
       <version>3.11.3</version>
     </dependency>
   </dependencies>
+
+  <!-- ─────────────────────────────────── Build ─────────────────────────────────── -->
   <build>
     <plugins>
+      <!-- Shade → single fat‑jar for Lambda → /target/backend-jobs-1.0-SNAPSHOT.jar -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -44,9 +63,21 @@
         <executions>
           <execution>
             <phase>package</phase>
-            <goals><goal>shade</goal></goals>
+            <goals>
+              <goal>shade</goal>
+            </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- Compiler → emit byte‑code for Java 21 to unlock text blocks, records, etc. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <release>21</release>
+        </configuration>
       </plugin>
     </plugins>
   </build>
