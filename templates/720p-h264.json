@@ -7,7 +7,7 @@
         "OutputGroupSettings": {
           "Type": "CMAF_GROUP_SETTINGS",
           "CmafGroupSettings": {
-            "Destination": "s3://OUTPUT_BUCKET/720p/",
+            "Destination": "s3://infrastructurestack-ae2outputbucket56fb940a-smjeg0fpj2a5/720p/",
             "SegmentLength": 6,
             "FragmentLength": 2
           }
@@ -21,6 +21,7 @@
                 "Codec": "H_264",
                 "H264Settings": {
                   "RateControlMode": "VBR",
+                  "Bitrate": 3000000,
                   "MaxBitrate": 3000000,
                   "GopSize": 48,
                   "GopSizeUnits": "FRAMES",
