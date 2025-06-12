@@ -1,0 +1,35 @@
+# ---------- Dockerfile.arm64 ----------
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023
+
+# ───────────── Base toolchain ─────────────
+RUN dnf -y install cmake meson gcc gcc-c++ nasm git zip pkgconf-pkg-config \
+ && dnf -y groupinstall "Development Tools"
+
+# ───────────── build static libvmaf ─────────────
+RUN git clone --depth 1 https://github.com/Netflix/vmaf.git \
+ && mkdir -p vmaf/libvmaf/build \
+ && cd vmaf/libvmaf/build \
+ && meson .. --buildtype release --default-library=static \
+ && ninja && ninja install
+
+# Make libvmaf discoverable for pkg-config & the dynamic loader
+ENV PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig"
+RUN echo "/usr/local/lib" >> /etc/ld.so.conf.d/libvmaf.conf && ldconfig
+
+# ───────────── build static ffmpeg ─────────────
+RUN curl -L https://ffmpeg.org/releases/ffmpeg-6.1.tar.xz | tar xJ \
+ && cd ffmpeg-6.1 \
+ && ./configure --disable-x86asm --arch=aarch64 \
+      --enable-gpl --enable-version3 --enable-libvmaf \
+      --enable-static --disable-shared --prefix=/opt \
+ && make -j$(nproc) && make install
+
+# ───────────── assemble Lambda layer ─────────────
+RUN mkdir -p /asset \
+ && cp -r /opt/bin /asset/ \
+ && cp -r /opt/lib /asset/
+WORKDIR /asset
+RUN zip -r /layer.zip .
+
+CMD ["bash"]
+# ----------------------------------------------

@@ -17,32 +17,31 @@ public class JobSubmitHandler implements RequestHandler<S3Event, Void> {
 
     private static final String TABLE_NAME        = System.getenv("TABLE_NAME");
     private static final String STATE_MACHINE_ARN = System.getenv("STATE_MACHINE_ARN");
-    private static final String SOURCE_BUCKET     = System.getenv("SOURCE_BUCKET");
 
     private final DynamoDbClient ddb = DynamoDbClient.create();
     private final SfnClient      sfn = SfnClient.create();
 
     @Override
-    public Void handleRequest(S3Event event, Context context) {
-
+    public Void handleRequest(S3Event event, Context ctx) {
         event.getRecords().forEach(rec -> {
 
-            /* ─────────── grab basic keys ─────────── */
-            String key   = rec.getS3().getObject().getKey();   // example: source/video.mp4
+            String key       = rec.getS3().getObject().getKey();     // e.g. source/video.mp4
+            String srcBucket = rec.getS3().getBucket().getName();
+            if (!key.startsWith("source/")) return;   // defense-in-depth
+
             String jobId = UUID.randomUUID().toString();
 
-            /* ─────────── 1 / 3  → DynamoDB record ─────────── */
+            /* 1 / 3  → DynamoDB record */
             ddb.putItem(PutItemRequest.builder()
                     .tableName(TABLE_NAME)
                     .item(Map.of(
                             "jobId",      AttributeValue.builder().s(jobId).build(),
                             "sourceKey",  AttributeValue.builder().s(key).build(),
                             "jobStatus",  AttributeValue.builder().s("PENDING").build(),
-                            "createdAt",  AttributeValue.builder().s(Instant.now().toString()).build()
-                    ))
+                            "createdAt",  AttributeValue.builder().s(Instant.now().toString()).build()))
                     .build());
 
-            /* ─────────── 2 / 3  → Step-Functions input payload ─────────── */
+            /* 2 / 3  → Step-Functions input payload */
             String inputJson = """
             {
               "jobId":"%s",
@@ -54,9 +53,9 @@ public class JobSubmitHandler implements RequestHandler<S3Event, Void> {
                 {"templateName":"AutoEncode2-540p-h264-qvbr","outputPrefix":"540","threshold":90}
               ]
             }
-            """.formatted(jobId, key, SOURCE_BUCKET);
+            """.formatted(jobId, key, srcBucket);
 
-            /* ─────────── 3 / 3  → kick off execution ─────────── */
+            /* 3 / 3  → kick off execution */
             sfn.startExecution(StartExecutionRequest.builder()
                     .stateMachineArn(STATE_MACHINE_ARN)
                     .name("job-" + jobId)

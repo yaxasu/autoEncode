@@ -7,13 +7,15 @@
         "OutputGroupSettings": {
           "Type": "CMAF_GROUP_SETTINGS",
           "CmafGroupSettings": {
-            "Destination": "s3://infrastructurestack-ae2outputbucket56fb940a-smjeg0fpj2a5/720p/",
+            "Destination": "s3://infrastructurestack-ae2outputbucket56fb940a-smjeg0fpj2a5/job-{jobId}/720/",
             "SegmentLength": 6,
-            "FragmentLength": 2
+            "FragmentLength": 2,
+            "WriteHlsManifest": "ENABLED"
           }
         },
         "Outputs": [
           {
+            "NameModifier": "_720p",
             "VideoDescription": {
               "Width": 1280,
               "Height": 720,

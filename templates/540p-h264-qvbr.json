@@ -7,13 +7,15 @@
         "OutputGroupSettings": {
           "Type": "CMAF_GROUP_SETTINGS",
           "CmafGroupSettings": {
-            "Destination": "s3://infrastructurestack-ae2outputbucket56fb940a-smjeg0fpj2a5/540p/",
+            "Destination": "s3://infrastructurestack-ae2outputbucket56fb940a-smjeg0fpj2a5/job-{jobId}/540/",
             "SegmentLength": 6,
-            "FragmentLength": 2
+            "FragmentLength": 2,
+            "WriteHlsManifest": "ENABLED"
           }
         },
         "Outputs": [
           {
+            "NameModifier": "_540p",
             "VideoDescription": {
               "Width": 960,
               "Height": 540,
@@ -22,9 +24,7 @@
                 "H264Settings": {
                   "RateControlMode": "QVBR",
                   "MaxBitrate": 1800000,
-                  "QvbrSettings": {
-                    "QvbrQualityLevel": 8
-                  },
+                  "QvbrSettings": { "QvbrQualityLevel": 8 },
                   "GopSize": 48,
                   "GopSizeUnits": "FRAMES",
                   "QualityTuningLevel": "SINGLE_PASS"

@@ -1,2 +1,4 @@
-com/autoencode/backend/JobSubmitHandler.class
 com/autoencode/backend/App.class
+com/autoencode/backend/VmafQualityFn.class
+com/autoencode/backend/JobSubmitHandler.class
+com/autoencode/backend/VmafQualityFn$S3Path.class
